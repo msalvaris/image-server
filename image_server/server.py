@@ -2,7 +2,7 @@
 """
 
 from fastapi import FastAPI, HTTPException
-from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 from starlette.requests import Request
 from fastapi.responses import StreamingResponse
 import os
@@ -63,14 +63,14 @@ async def read_root(request: Request, images_dir: str = "images"):
     # List all files in the image directory
     image_files = sorted([f for f in os.listdir(images_dir) if os.path.isfile(os.path.join(images_dir, f))])
     thumbnail_dir_name = create_thumbnails(image_files, images_dir)
-    image_files = sorted([f for f in os.listdir(thumbnail_dir_name) if os.path.isfile(os.path.join(thumbnail_dir_name, f))])
+    image_thumbs = sorted([f for f in os.listdir(thumbnail_dir_name) if os.path.isfile(os.path.join(thumbnail_dir_name, f))])
 
-    images_dir_for_js = thumbnail_dir_name.replace("\\", "/") # replace the \\ with / for correct interpretation by javascript
-
-    img_data = [(img,info.replace("\\", "/"))for img,info in zip(image_files, image_files)]
+    thumbs_dir_for_js = thumbnail_dir_name.replace("\\", "/") # replace the \\ with / for correct interpretation by javascript
+    images_dir_for_js = images_dir.replace("\\", "/") # replace the \\ with / for correct interpretation by javascript
+    img_data = [(img,info.replace("\\", "/")) for img,info in zip(image_thumbs, image_files)]
     template = env.get_template('index.html')
-    # return templates.TemplateResponse("index.html", {"request": request, "images": img_data, "images_dir": images_dir_for_js})
-    return template.render(request=request, images=img_data, images_dir=images_dir_for_js)
+    html_content = template.render(url_for=request.url_for, images=img_data, thumbs_dir=thumbs_dir_for_js, images_dir=images_dir_for_js)
+    return HTMLResponse(content=html_content)
 
 
 @app.get("/images/{path:path}")

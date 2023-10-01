@@ -112,7 +112,11 @@
     <script>
         const images = [
             {% for image,imgf in images %}
-                {imgSrc: '{{ url_for('serve_image', path=images_dir + '/' + image) }}', imgDescription: '{{imgf}}'},
+                {
+                    imgThumb: '{{ url_for('serve_image', path=thumbs_dir + '/' + image) }}', 
+                    imgSrc: '{{ url_for('serve_image', path=images_dir + '/' + image) }}',  
+                    imgDescription: '{{imgf}}'
+                },
             {% endfor %}
         ];
 
@@ -125,9 +129,9 @@
             const startIndex = page * imagesPerPage;
             const endIndex = startIndex + imagesPerPage;
             const imagesToShow = images.slice(startIndex, endIndex);
-            imageGrid.innerHTML = imagesToShow.map(({imgSrc, imgDescription}) => `
+            imageGrid.innerHTML = imagesToShow.map(({imgThumb, imgSrc, imgDescription}) => `
                 <div class=tooltip-container>
-                    <img src="${imgSrc}" alt="Image" onclick="showModal('${imgSrc}')">
+                    <img src="${imgThumb}" alt="Image" onclick="showModal('${imgSrc}')">
                     <span class="tooltip-text">${imgDescription}</span>
                 </div>
             `).join('');
