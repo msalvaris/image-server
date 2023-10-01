@@ -29,6 +29,9 @@ setup(
             "image-server=image_server.server:main",
         ]
     },
+    package_data={
+        'image_server': ['templates/*.html']
+    },
     name="image-server",
     packages=find_packages(include=["image_server", "image_server.*"]),
     url="https://github.com/msalvaris/image-server",

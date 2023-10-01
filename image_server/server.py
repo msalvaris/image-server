@@ -10,12 +10,20 @@ import io
 from PIL import Image
 from rich.progress import track
 from rich.console import Console
+from jinja2 import Environment, ChoiceLoader, FileSystemLoader, PackageLoader
+
+
+# Configure the Environment to use the ChoiceLoader
+env = Environment(
+    loader=ChoiceLoader([
+        FileSystemLoader('templates'),  
+        PackageLoader('image_server', 'templates') 
+    ])
+)
 
 console = Console()
 
 app = FastAPI()
-
-templates = Jinja2Templates(directory="templates")
 
 
 def create_thumbnails(image_files, directory):
@@ -60,7 +68,9 @@ async def read_root(request: Request, images_dir: str = "images"):
     images_dir_for_js = thumbnail_dir_name.replace("\\", "/") # replace the \\ with / for correct interpretation by javascript
 
     img_data = [(img,info.replace("\\", "/"))for img,info in zip(image_files, image_files)]
-    return templates.TemplateResponse("index.html", {"request": request, "images": img_data, "images_dir": images_dir_for_js})
+    template = env.get_template('index.html')
+    # return templates.TemplateResponse("index.html", {"request": request, "images": img_data, "images_dir": images_dir_for_js})
+    return template.render(request=request, images=img_data, images_dir=images_dir_for_js)
 
 
 @app.get("/images/{path:path}")
@@ -82,4 +92,5 @@ def main():
     # For another directory other_folder: http://127.0.0.1:8000/?images_dir=other_folder
     # For windows http://127.0.0.1:8000/?images_dir=C:\\Users\\msalvaris\\Documents\\ml_group_ppt_images
     
-
+if __name__=="__main__":
+    main()
