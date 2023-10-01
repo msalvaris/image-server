@@ -22,13 +22,12 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/msalvaris/image-server.git
-cd image-server
 ```
 
 Install
 
 ```bash
-pip install https://github.com/msalvaris/image-server.git
+pip install image-server
 ```
 
 ## Usage
